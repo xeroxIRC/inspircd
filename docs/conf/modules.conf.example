@@ -2349,3 +2349,47 @@
 # You will almost always want to load this.
 #
 #<module name="spanningtree">
+
+
+# -------------------- CUSTOM MODULES --------------------
+
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
+# Timed static quit: Users that quit and have been online for less than a
+# minimum amount of time do not have custom quit messages, but have
+# a configured static message.
+#<module name="timedstaticquit">
+
+# Specify the static quit message and the maximum time for it to be used
+#<timedstaticquit message="Client Quit" maxage="5m">
+
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
+# Channel name whitelist: This module adds a whitelist for channel names
+# where no channel that contains a character that is not on this whitelist
+# may be joined by any user (including IRC operators). This list implicitly
+# contains the "#" character.
+#<module name="channame_whitelist">
+
+# Specify the characters that should be allowed in channel names. Use
+# XML entities to add special characters.
+#<channamewl allowchars="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`~!@#$%^&amp;*()_+-=[]\{}|;':&quot;,./<>?">
+
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
+# List mode extend: Provides an oper-only channel mode E that allows
+# the on-the-fly extension of list mode lists. If this module is loaded
+# the default channel list limits specified are unused, and the ones
+# used in options#normallistsize and options#extendedlistsize are
+# used instead.
+#
+# +E takes one parameter. This parameter may be "*" or a list of
+# modes to raise the limit on. If the parameter is "*", all list modes
+# will be extended on that channel, otherwise only the specified list modes
+# will be extended.
+#
+# Example: +E be
+#    This will extend the ban list and the ban exemption list
+# Example: +E Ig
+#    This will extend the channel invite exemption list and the channel
+#    filter list.
+# Example: +E *
+#    This will extend ALL list modes on the channel.
+#<module name="listmodeextend">

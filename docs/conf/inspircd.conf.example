@@ -702,7 +702,15 @@
 
          # nosnoticestack: This prevents snotices from 'stacking' and giving you
          # the message saying '(last message repeated X times)'. Defaults to no.
-         nosnoticestack="no">
+         nosnoticestack="no"
+
+         # normallistsize: This is the unextended list mode list size for a
+         # channel. Implemented by the listmodeextend module.
+         normallistsize="20"
+
+         # extendedlistsize: This is the extended list mode list size for a
+         # channel. Implemented by the listmodeextend module.
+         extendedlistsize="100">
 
 
 #-#-#-#-#-#-#-#-#-#-#-# PERFORMANCE CONFIGURATION #-#-#-#-#-#-#-#-#-#-#
