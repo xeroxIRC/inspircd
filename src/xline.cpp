@@ -554,15 +554,25 @@ bool XLine::IsBurstable()
 void XLine::DefaultApply(User* u, const std::string &line, bool bancache)
 {
 	const std::string banReason = line + "-lined: " + reason;
+	char timebuf[512] = {};
 
 	if (!ServerInstance->Config->XLineMessage.empty())
 		u->WriteNumeric(ERR_YOUREBANNEDCREEP, ServerInstance->Config->XLineMessage);
+
+	if (duration == 0)
+	{
+		u->WriteNotice("*** This ban will never expire.");
+	}
+	else
+	{
+		strftime(timebuf, 512, "%A, %B %d, %Y at %I:%M:%S %p (%Z)", gmtime(&this->expiry));
+		u->WriteNotice("*** This ban will expire on " + std::string(timebuf) + ".");
+	}
 
 	if (ServerInstance->Config->HideBans)
 		ServerInstance->Users->QuitUser(u, line + "-lined", &banReason);
 	else
 		ServerInstance->Users->QuitUser(u, banReason);
-
 
 	if (bancache)
 	{

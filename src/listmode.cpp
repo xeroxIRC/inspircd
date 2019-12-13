@@ -109,14 +109,33 @@ void ListModeBase::DoRehash()
 
 unsigned int ListModeBase::FindLimit(const std::string& channame)
 {
-	for (limitlist::iterator it = chanlimits.begin(); it != chanlimits.end(); ++it)
+	Channel* chan = ServerInstance->FindChan(channame);
+	ModeHandler* mh = ServerInstance->Modes->FindMode('E', MODETYPE_CHANNEL);
+	if (mh)
 	{
-		if (InspIRCd::Match(channame, it->mask))
+		std::string param = chan->GetModeParameter(mh);
+
+		if (chan->IsModeSet(mh) && (param == "*" || param.find(mode) != std::string::npos))
 		{
-			// We have a pattern matching the channel
-			return it->limit;
+			return ServerInstance->Config->ExtendedListmodeSize;
+		}
+		else
+		{
+			return ServerInstance->Config->UnextendedListmodeSize;
 		}
 	}
+	else
+	{
+		for (limitlist::iterator it = chanlimits.begin(); it != chanlimits.end(); ++it)
+		{
+			if (InspIRCd::Match(channame, it->mask))
+			{
+				// We have a pattern matching the channel
+				return it->limit;
+			}
+		}
+	}
+
 	return 0;
 }
 
@@ -134,6 +153,16 @@ unsigned int ListModeBase::GetLimit(Channel* channel)
 		return FindLimit(channel->name);
 
 	return GetLimitInternal(channel->name, cd);
+}
+
+void ListModeBase::InvalidateLimit(Channel* channel)
+{
+	ChanData* cd = extItem.get(channel);
+
+	if (cd)
+	{
+		cd->maxitems = -1;
+	}
 }
 
 unsigned int ListModeBase::GetLowerLimit()

@@ -390,6 +390,8 @@ void ServerConfig::Fill()
 	Limits = ServerLimits(ConfValue("limits"));
 	Paths = ServerPaths(ConfValue("path"));
 	NoSnoticeStack = options->getBool("nosnoticestack", false);
+	UnextendedListmodeSize = options->getUInt("normallistsize", 20);
+	ExtendedListmodeSize = options->getUInt("extendedlistsize", 100);
 
 	std::string defbind = options->getString("defaultbind");
 	if (stdalgo::string::equalsci(defbind, "ipv4"))

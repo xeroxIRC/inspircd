@@ -129,6 +129,10 @@ class CoreExport ListModeBase : public ModeHandler
 	 */
 	unsigned int GetLimit(Channel* channel);
 
+	/** Invalidate the cached channel limit
+	 */
+	void InvalidateLimit(Channel* channel);
+
 	/** Gets the lower list limit for this listmode.
 	 */
 	unsigned int GetLowerLimit();

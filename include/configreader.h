@@ -463,6 +463,14 @@ class CoreExport ServerConfig
 	/** If this value is true, snotices will not stack when repeats are sent
 	 */
 	bool NoSnoticeStack;
+
+	/** Max list size for channels without extention
+	 */
+	unsigned int UnextendedListmodeSize;
+
+	/** Max list size for extended channels
+	 */
+	unsigned int ExtendedListmodeSize;
 };
 
 /** The background thread for config reading, so that reading from executable includes
