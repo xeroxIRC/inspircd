@@ -192,7 +192,7 @@ void UserManager::AddUser(int socket, ListenSocket* via, irc::sockets::sockaddrs
 				New->WriteNumeric(ERR_YOUREBANNEDCREEP, ServerInstance->Config->XLineMessage);
 
 			if (ServerInstance->Config->HideBans)
-				this->QuitUser(New, b->Type + "-lined", &b->Reason);
+				this->QuitUser(New, "Banned", &b->Reason);
 			else
 				this->QuitUser(New, b->Reason);
 			return;

@@ -36,6 +36,12 @@ public:
 	{
 		return Version("Provides the feature where users who have not been connected for long enough may not use a custom quit message.");
 	}
+
+	void Prioritize() CXX11_OVERRIDE
+	{
+		// We eat the quit command so we go last
+		ServerInstance->Modules->SetPriority(this, PRIORITY_LAST);
+	}
 };
 
 MODULE_INIT(TimedStaticQuitModule)

@@ -570,7 +570,7 @@ void XLine::DefaultApply(User* u, const std::string &line, bool bancache)
 	}
 
 	if (ServerInstance->Config->HideBans)
-		ServerInstance->Users->QuitUser(u, line + "-lined", &banReason);
+		ServerInstance->Users->QuitUser(u, "Banned", &banReason);
 	else
 		ServerInstance->Users->QuitUser(u, banReason);
 
