@@ -1,13 +1,18 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
+ *   Copyright (C) 2019 Matt Schatz <genius3000@g3k.solutions>
+ *   Copyright (C) 2018 linuxdaemon <linuxdaemon.irc@gmail.com>
+ *   Copyright (C) 2013 Daniel Vassdal <shutter@canternet.org>
+ *   Copyright (C) 2013 Adam <Adam@anope.org>
+ *   Copyright (C) 2012-2015 Attila Molnar <attilamolnar@hush.com>
+ *   Copyright (C) 2012-2014, 2017-2018 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2012, 2018 Robby <robby@chatbelgie.be>
+ *   Copyright (C) 2012 ChrisTX <xpipe@hotmail.de>
  *   Copyright (C) 2009-2010 Daniel De Graaf <danieldg@inspircd.org>
- *   Copyright (C) 2006-2008 Robin Burchell <robin+git@viroteck.net>
- *   Copyright (C) 2005-2008 Craig Edwards <craigedwards@brainbox.cc>
- *   Copyright (C) 2008 Thomas Stagner <aquanight@inspircd.org>
- *   Copyright (C) 2006-2007 Oliver Lupton <oliverlupton@gmail.com>
+ *   Copyright (C) 2007, 2010 Craig Edwards <brain@inspircd.org>
  *   Copyright (C) 2007 Dennis Friis <peavey@inspircd.org>
- *   Copyright (C) 2003-2019 Anope Team <team@anope.org>
+ *   Copyright (C) 2006-2008 Robin Burchell <robin+git@viroteck.net>
  *
  * This file is part of InspIRCd.  InspIRCd is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -336,18 +341,6 @@ bool InspIRCd::IsSID(const std::string &str)
 	return ((str.length() == 3) && isdigit(str[0]) &&
 			((str[1] >= 'A' && str[1] <= 'Z') || isdigit(str[1])) &&
 			 ((str[2] >= 'A' && str[2] <= 'Z') || isdigit(str[2])));
-}
-
-void InspIRCd::CheckRoot()
-{
-#ifndef _WIN32
-	if (geteuid() == 0)
-	{
-		std::cout << "ERROR: You are running an irc server as root! DO NOT DO THIS!" << std::endl << std::endl;
-		this->Logs->Log("STARTUP", LOG_DEFAULT, "Can't start as root");
-		Exit(EXIT_STATUS_ROOT);
-	}
-#endif
 }
 
 /** A lookup table of values for multiplier characters used by

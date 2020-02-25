@@ -1,8 +1,12 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
+ *   Copyright (C) 2018 Matt Schatz <genius3000@g3k.solutions>
+ *   Copyright (C) 2013-2014 Attila Molnar <attilamolnar@hush.com>
+ *   Copyright (C) 2013, 2018-2019 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2012, 2019 Robby <robby@chatbelgie.be>
+ *   Copyright (C) 2008, 2010 Craig Edwards <brain@inspircd.org>
  *   Copyright (C) 2008 Robin Burchell <robin+git@viroteck.net>
- *   Copyright (C) 2008 Craig Edwards <craigedwards@brainbox.cc>
  *
  * This file is part of InspIRCd.  InspIRCd is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -122,7 +126,7 @@ class CoreExport ProtocolInterface
 	 * @param status The status character (e.g. %) required to receive.
 	 * @param text The message to send.
 	 */
-	void SendChannelNotice(Channel* target, char status, const std::string &text)
+	DEPRECATED_METHOD(void SendChannelNotice(Channel* target, char status, const std::string& text))
 	{
 		SendMessage(target, status, text, MSG_NOTICE);
 	}
@@ -131,7 +135,7 @@ class CoreExport ProtocolInterface
 	 * @param target The user to message.
 	 * @param text The message to send.
 	 */
-	void SendUserNotice(User* target, const std::string &text)
+	DEPRECATED_METHOD(void SendUserNotice(User* target, const std::string& text))
 	{
 		SendMessage(target, text, MSG_NOTICE);
 	}

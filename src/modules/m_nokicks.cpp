@@ -1,10 +1,15 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
- *   Copyright (C) 2009 Daniel De Graaf <danieldg@inspircd.org>
- *   Copyright (C) 2004, 2008 Craig Edwards <craigedwards@brainbox.cc>
+ *   Copyright (C) 2019 Matt Schatz <genius3000@g3k.solutions>
+ *   Copyright (C) 2013, 2017 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2012, 2019 Robby <robby@chatbelgie.be>
+ *   Copyright (C) 2012 Attila Molnar <attilamolnar@hush.com>
+ *   Copyright (C) 2009-2010 Daniel De Graaf <danieldg@inspircd.org>
+ *   Copyright (C) 2009 Uli Schlachter <psychon@inspircd.org>
+ *   Copyright (C) 2008 Robin Burchell <robin+git@viroteck.net>
  *   Copyright (C) 2007 Dennis Friis <peavey@inspircd.org>
- *   Copyright (C) 2007 Robin Burchell <robin+git@viroteck.net>
+ *   Copyright (C) 2006, 2010 Craig Edwards <brain@inspircd.org>
  *
  * This file is part of InspIRCd.  InspIRCd is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -39,10 +44,12 @@ class ModuleNoKicks : public Module
 
 	ModResult OnUserPreKick(User* source, Membership* memb, const std::string &reason) CXX11_OVERRIDE
 	{
-		if (!memb->chan->GetExtBanStatus(source, 'Q').check(!memb->chan->IsModeSet(nk)))
+		bool modeset = memb->chan->IsModeSet(nk);
+		if (!memb->chan->GetExtBanStatus(source, 'Q').check(!modeset))
 		{
 			// Can't kick with Q in place, not even opers with override, and founders
-			source->WriteNumeric(ERR_CHANOPRIVSNEEDED, memb->chan->name, InspIRCd::Format("Can't kick user %s from channel (+Q is set)", memb->user->nick.c_str()));
+			source->WriteNumeric(ERR_CHANOPRIVSNEEDED, memb->chan->name, InspIRCd::Format("Can't kick user %s from channel (%s)",
+				memb->user->nick.c_str(), modeset ? "+Q is set" : "you're extbanned"));
 			return MOD_RES_DENY;
 		}
 		return MOD_RES_PASSTHRU;

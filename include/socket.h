@@ -1,12 +1,16 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
- *   Copyright (C) 2009 Daniel De Graaf <danieldg@inspircd.org>
- *   Copyright (C) 2005-2007 Craig Edwards <craigedwards@brainbox.cc>
+ *   Copyright (C) 2013, 2015-2016 Attila Molnar <attilamolnar@hush.com>
+ *   Copyright (C) 2012-2013, 2017-2019 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2012 Robby <robby@chatbelgie.be>
+ *   Copyright (C) 2012 ChrisTX <xpipe@hotmail.de>
+ *   Copyright (C) 2012 Adam <Adam@anope.org>
+ *   Copyright (C) 2009-2010 Daniel De Graaf <danieldg@inspircd.org>
+ *   Copyright (C) 2008, 2010 Craig Edwards <brain@inspircd.org>
+ *   Copyright (C) 2008 Pippijn van Steenhoven <pip88nl@gmail.com>
+ *   Copyright (C) 2007-2008 Robin Burchell <robin+git@viroteck.net>
  *   Copyright (C) 2007 Dennis Friis <peavey@inspircd.org>
- *   Copyright (C) 2007 Robin Burchell <robin+git@viroteck.net>
- *   Copyright (C) 2006 Oliver Lupton <oliverlupton@gmail.com>
- *   Copyright (C) 2006 William Pitcock <nenolod@dereferenced.org>
  *
  * This file is part of InspIRCd.  InspIRCd is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -136,10 +140,32 @@ namespace irc
 	}
 }
 
+/** Represents information about a failed port binding. */
+struct CoreExport FailedPort
+{
+	
+	/** The error which happened during binding. */
+	int error;
+
+	/** The endpoint on which we were attempting to bind. */
+	irc::sockets::sockaddrs sa;
+
+	/** The config tag that the listener was created from. */
+	ConfigTag* tag;
+
+	FailedPort(int err, irc::sockets::sockaddrs& ep, ConfigTag* cfg)
+		: error(err)
+		, sa(ep)
+		, tag(cfg)
+	{
+	}
+};
+
 /** A list of failed port bindings, used for informational purposes on startup */
-typedef std::vector<std::pair<irc::sockets::sockaddrs, int> > FailedPortList;
+typedef std::vector<FailedPort> FailedPortList;
 
 #include "socketengine.h"
+
 /** This class handles incoming connections on client ports.
  * It will create a new User for every valid connection
  * and assign it a file descriptor.

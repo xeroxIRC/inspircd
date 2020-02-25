@@ -1,12 +1,20 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
- *   Copyright (C) 2009-2010 Daniel De Graaf <danieldg@inspircd.org>
- *   Copyright (C) 2007-2009 Robin Burchell <robin+git@viroteck.net>
- *   Copyright (C) 2006-2009 Dennis Friis <peavey@inspircd.org>
- *   Copyright (C) 2006-2008 Craig Edwards <craigedwards@brainbox.cc>
+ *   Copyright (C) 2019 Matt Schatz <genius3000@g3k.solutions>
+ *   Copyright (C) 2013-2016 Attila Molnar <attilamolnar@hush.com>
+ *   Copyright (C) 2013-2014, 2016-2019 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2013 Daniel Vassdal <shutter@canternet.org>
+ *   Copyright (C) 2012 Robby <robby@chatbelgie.be>
+ *   Copyright (C) 2012 Justin Crawford <Justasic@Gmail.com>
+ *   Copyright (C) 2012 DjSlash <djslash@djslash.org>
+ *   Copyright (C) 2012 ChrisTX <xpipe@hotmail.de>
+ *   Copyright (C) 2009-2011 Daniel De Graaf <danieldg@inspircd.org>
+ *   Copyright (C) 2009 Uli Schlachter <psychon@inspircd.org>
  *   Copyright (C) 2008 Thomas Stagner <aquanight@inspircd.org>
- *   Copyright (C) 2006 Oliver Lupton <oliverlupton@gmail.com>
+ *   Copyright (C) 2007-2010 Robin Burchell <robin+git@viroteck.net>
+ *   Copyright (C) 2007 Dennis Friis <peavey@inspircd.org>
+ *   Copyright (C) 2006-2008 Craig Edwards <brain@inspircd.org>
  *
  * This file is part of InspIRCd.  InspIRCd is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -80,11 +88,16 @@ static void ReadXLine(ServerConfig* conf, const std::string& tag, const std::str
 	for(ConfigIter i = tags.first; i != tags.second; ++i)
 	{
 		ConfigTag* ctag = i->second;
-		std::string mask;
-		if (!ctag->readString(key, mask))
-			throw CoreException("<"+tag+":"+key+"> missing at " + ctag->getTagLocation());
-		std::string reason = ctag->getString("reason", "<Config>");
-		XLine* xl = make->Generate(ServerInstance->Time(), 0, "<Config>", reason, mask);
+
+		const std::string mask = ctag->getString(key);
+		if (mask.empty())
+			throw CoreException("<" + tag + ":" + key + "> missing at " + ctag->getTagLocation());
+
+		const std::string reason = ctag->getString("reason");
+		if (reason.empty())
+			throw CoreException("<" + tag + ":reason> missing at " + ctag->getTagLocation());
+
+		XLine* xl = make->Generate(ServerInstance->Time(), 0, ServerInstance->Config->ServerName, reason, mask);
 		xl->from_config = true;
 		configlines.insert(xl->Displayable());
 		if (!ServerInstance->XLines->AddLine(xl, NULL))
@@ -363,7 +376,8 @@ void ServerConfig::Fill()
 			throw CoreException("You must restart to change the server id");
 
 		std::string casemapping = options->getString("casemapping");
-		if (!casemapping.empty() && casemapping != CaseMapping)
+		// Ignore this value if CaseMapping is set to something the core doesn't provide (i.e., m_nationalchars).
+		if (!casemapping.empty() && casemapping != CaseMapping && (CaseMapping == "ascii" || CaseMapping == "rfc1459"))
 			throw CoreException("You must restart to change the server casemapping");
 
 	}
@@ -506,18 +520,17 @@ void ServerConfig::Apply(ServerConfig* old, const std::string &useruid)
 		ServerInstance->BindPorts(pl);
 		if (pl.size())
 		{
-			errstr << "Not all your client ports could be bound." << std::endl
-				<< "The following port(s) failed to bind:" << std::endl;
-
-			int j = 1;
-			for (FailedPortList::iterator i = pl.begin(); i != pl.end(); i++, j++)
+			std::cout << "Warning! Some of your listener" << (pl.size() == 1 ? "s" : "") << " failed to bind:" << std::endl;
+			for (FailedPortList::const_iterator iter = pl.begin(); iter != pl.end(); ++iter)
 			{
-				errstr << j << ".\tAddress: " << i->first.str() << "\tReason: " << strerror(i->second) << std::endl;
+				const FailedPort& fp = *iter;
+				errstr << "  " << fp.sa.str() << ": " << strerror(fp.error) << std::endl
+					<< "  " << "Created from <bind> tag at " << fp.tag->getTagLocation() << std::endl;
 			}
 		}
 	}
 
-	User* user = useruid.empty() ? NULL : ServerInstance->FindNick(useruid);
+	User* user = useruid.empty() ? NULL : ServerInstance->FindUUID(useruid);
 
 	if (!valid)
 	{
@@ -701,7 +714,7 @@ void ConfigReaderThread::Finish()
 		ServerInstance->Users.RehashCloneCounts();
 		ServerInstance->XLines->CheckELines();
 		ServerInstance->XLines->ApplyLines();
-		User* user = ServerInstance->FindNick(TheUserUID);
+		User* user = ServerInstance->FindUUID(TheUserUID);
 
 		ConfigStatus status(user);
 		const ModuleManager::ModuleMap& mods = ServerInstance->Modules->GetModules();

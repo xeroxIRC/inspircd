@@ -1,11 +1,16 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
- *   Copyright (C) 2009 Daniel De Graaf <danieldg@inspircd.org>
- *   Copyright (C) 2008 Thomas Stagner <aquanight@inspircd.org>
- *   Copyright (C) 2007-2008 Craig Edwards <craigedwards@brainbox.cc>
+ *   Copyright (C) 2019 linuxdaemon <linuxdaemon.irc@gmail.com>
+ *   Copyright (C) 2013-2016, 2018 Attila Molnar <attilamolnar@hush.com>
+ *   Copyright (C) 2013, 2017-2020 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2013 Adam <Adam@anope.org>
+ *   Copyright (C) 2012 Robby <robby@chatbelgie.be>
+ *   Copyright (C) 2009-2010 Daniel De Graaf <danieldg@inspircd.org>
+ *   Copyright (C) 2009 Uli Schlachter <psychon@inspircd.org>
+ *   Copyright (C) 2007-2008 Dennis Friis <peavey@inspircd.org>
+ *   Copyright (C) 2007, 2009-2010 Craig Edwards <brain@inspircd.org>
  *   Copyright (C) 2007 Robin Burchell <robin+git@viroteck.net>
- *   Copyright (C) 2007 Dennis Friis <peavey@inspircd.org>
  *
  * This file is part of InspIRCd.  InspIRCd is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -33,6 +38,7 @@
 #include "servercommand.h"
 #include "commands.h"
 #include "protocolinterface.h"
+#include "tags.h"
 
 /** An enumeration of all known protocol versions.
  *
@@ -109,11 +115,14 @@ class ModuleSpanningTree
 	/** API for accessing user SSL certificates. */
 	UserCertificateAPI sslapi;
 
+	/** Tag for marking services pseudoclients. */
+	ServiceTag servicetag;
+
  public:
 	dynamic_reference<DNS::Manager> DNS;
 
 	/** Event provider for message tags. */
-	Events::ModuleEventProvider tagevprov;
+	ClientProtocol::MessageTagEvent tagevprov;
 
 	ServerCommandManager CmdManager;
 

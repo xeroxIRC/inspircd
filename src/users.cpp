@@ -1,13 +1,25 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
- *   Copyright (C) 2009-2010 Daniel De Graaf <danieldg@inspircd.org>
- *   Copyright (C) 2006-2009 Robin Burchell <robin+git@viroteck.net>
- *   Copyright (C) 2006-2007, 2009 Dennis Friis <peavey@inspircd.org>
- *   Copyright (C) 2008 John Brooks <john.brooks@dereferenced.net>
+ *   Copyright (C) 2019 linuxdaemon <linuxdaemon.irc@gmail.com>
+ *   Copyright (C) 2018 systocrat <systocrat@outlook.com>
+ *   Copyright (C) 2018 Dylan Frank <b00mx0r@aureus.pw>
+ *   Copyright (C) 2014 satmd <satmd@lain.at>
+ *   Copyright (C) 2013-2014, 2016-2019 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2013 Daniel Vassdal <shutter@canternet.org>
+ *   Copyright (C) 2013 ChrisTX <xpipe@hotmail.de>
+ *   Copyright (C) 2013 Adam <Adam@anope.org>
+ *   Copyright (C) 2012-2016, 2018 Attila Molnar <attilamolnar@hush.com>
+ *   Copyright (C) 2012, 2019 Robby <robby@chatbelgie.be>
+ *   Copyright (C) 2012 DjSlash <djslash@djslash.org>
+ *   Copyright (C) 2011 jackmcbarn <jackmcbarn@inspircd.org>
+ *   Copyright (C) 2009-2011 Daniel De Graaf <danieldg@inspircd.org>
+ *   Copyright (C) 2009 Uli Schlachter <psychon@inspircd.org>
  *   Copyright (C) 2008 Thomas Stagner <aquanight@inspircd.org>
- *   Copyright (C) 2008 Oliver Lupton <oliverlupton@gmail.com>
- *   Copyright (C) 2003-2008 Craig Edwards <craigedwards@brainbox.cc>
+ *   Copyright (C) 2008 John Brooks <special@inspircd.org>
+ *   Copyright (C) 2007-2009 Robin Burchell <robin+git@viroteck.net>
+ *   Copyright (C) 2007, 2009 Dennis Friis <peavey@inspircd.org>
+ *   Copyright (C) 2006-2009 Craig Edwards <brain@inspircd.org>
  *
  * This file is part of InspIRCd.  InspIRCd is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -77,6 +89,9 @@ User::User(const std::string& uid, Server* srv, UserType type)
 	client_sa.sa.sa_family = AF_UNSPEC;
 
 	ServerInstance->Logs->Log("USERS", LOG_DEBUG, "New UUID for user: %s", uuid.c_str());
+
+	if (srv->IsULine())
+		ServerInstance->Users->uline_count++;
 
 	// Do not insert FakeUsers into the uuidlist so FindUUID() won't return them which is the desired behavior
 	if (type != USERTYPE_SERVER)
@@ -338,6 +353,9 @@ CullResult User::cull()
 
 	if (client_sa.family() != AF_UNSPEC)
 		ServerInstance->Users->RemoveCloneCounts(this);
+
+	if (server->IsULine() && ServerInstance->Users->uline_count)
+		ServerInstance->Users->uline_count--;
 
 	return Extensible::cull();
 }
@@ -853,7 +871,7 @@ void User::WriteNumeric(const Numeric::Numeric& numeric)
 
 void User::WriteRemoteNotice(const std::string& text)
 {
-	ServerInstance->PI->SendUserNotice(this, text);
+	ServerInstance->PI->SendMessage(this, text, MSG_NOTICE);
 }
 
 void LocalUser::WriteRemoteNotice(const std::string& text)

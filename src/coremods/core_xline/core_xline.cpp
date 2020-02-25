@@ -1,7 +1,11 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
- *   Copyright (C) 2014 Attila Molnar <attilamolnar@hush.com>
+ *   Copyright (C) 2019 linuxdaemon <linuxdaemon.irc@gmail.com>
+ *   Copyright (C) 2019 Matt Schatz <genius3000@g3k.solutions>
+ *   Copyright (C) 2018-2019 Robby <robby@chatbelgie.be>
+ *   Copyright (C) 2017-2019 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2014, 2016 Attila Molnar <attilamolnar@hush.com>
  *
  * This file is part of InspIRCd.  InspIRCd is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -91,6 +95,14 @@ class CoreModXLine : public Module
 		// Send a numeric because if we deny then the core doesn't reply anything
 		user->WriteNumeric(ERR_ERRONEUSNICKNAME, newnick, InspIRCd::Format("Invalid nickname: %s", xline->reason.c_str()));
 		return MOD_RES_DENY;
+	}
+
+	void OnGarbageCollect() CXX11_OVERRIDE
+	{
+		// HACK: ELines are not expired properly at the moment but it can't be fixed
+		// as the XLine system is a spaghetti nightmare. Instead we skip over expired
+		// ELines in XLineManager::CheckELines() and expire them here instead.
+		ServerInstance->XLines->GetAll("E");
 	}
 
 	Version GetVersion() CXX11_OVERRIDE

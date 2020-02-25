@@ -1,9 +1,16 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
- *   Copyright (C) 2007 Dennis Friis <peavey@inspircd.org>
- *   Copyright (C) 2007 Craig Edwards <craigedwards@brainbox.cc>
- *   Copyright (C) 2007 Robin Burchell <robin+git@viroteck.net>
+ *   Copyright (C) 2013-2015 Attila Molnar <attilamolnar@hush.com>
+ *   Copyright (C) 2013, 2015, 2018-2019 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2012-2013 ChrisTX <xpipe@hotmail.de>
+ *   Copyright (C) 2012 Robby <robby@chatbelgie.be>
+ *   Copyright (C) 2011, 2014, 2019 Adam <Adam@anope.org>
+ *   Copyright (C) 2009 Uli Schlachter <psychon@inspircd.org>
+ *   Copyright (C) 2007-2009 Robin Burchell <robin+git@viroteck.net>
+ *   Copyright (C) 2007-2008 Craig Edwards <brain@inspircd.org>
+ *   Copyright (C) 2007, 2009 Dennis Friis <peavey@inspircd.org>
+ *   Copyright (C) 2007 burlex <burlex@e03df62e-2008-0410-955e-edbf42e46eb7>
  *
  * This file is part of InspIRCd.  InspIRCd is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -60,6 +67,9 @@
 #define _CRT_SECURE_NO_DEPRECATE
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 
+// Windows doesn't support getopt_long so we use ya_getopt instead.
+#include "ya_getopt.h"
+
 /* Normal windows (platform-specific) includes */
 #include <winsock2.h>
 #pragma comment(lib, "Ws2_32.lib")
@@ -90,21 +100,7 @@ typedef SSIZE_T ssize_t;
 /* _popen, _pclose */
 #define popen _popen
 #define pclose _pclose
-
-/* getopt() wrapper */
-#define no_argument            0
-#define required_argument      1
-#define optional_argument      2
-struct option
-{
-	char *name;
-	int has_arg;
-	int *flag;
-	int val;
-};
-extern int optind;
-extern char optarg[514];
-int getopt_long(int ___argc, char *const *___argv, const char *__shortopts, const struct option *__longopts, int *__longind);
+#define getpid _getpid
 
 // warning: 'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'
 // Normally, this is a huge problem, but due to our new/delete remap, we can ignore it.

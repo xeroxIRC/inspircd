@@ -1,11 +1,9 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
- *   Copyright (C) 2013 Adam <Adam@anope.org>
- *   Copyright (C) 2009 Robin Burchell <robin+git@viroteck.net>
- *   Copyright (C) 2008 Pippijn van Steenhoven <pip88nl@gmail.com>
- *   Copyright (C) 2008 Craig Edwards <craigedwards@brainbox.cc>
- *   Copyright (C) 2007 Carsten Valdemar Munk <carsten.munk+inspircd@gmail.com>
+ *   Copyright (C) 2017-2019 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2014, 2018 Attila Molnar <attilamolnar@hush.com>
+ *   Copyright (C) 2013-2014 Adam <Adam@anope.org>
  *
  * This file is part of InspIRCd.  InspIRCd is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -180,14 +178,14 @@ class AdminBindInterface : public LDAPInterface
 	}
 };
 
-class ModuleLDAPAuth : public Module
+class ModuleLDAPOper : public Module
 {
 	dynamic_reference<LDAPProvider> LDAP;
 	std::string base;
 	std::string attribute;
 
  public:
-	ModuleLDAPAuth()
+	ModuleLDAPOper()
 		: LDAP(this, "LDAP")
 	{
 		me = this;
@@ -246,4 +244,4 @@ class ModuleLDAPAuth : public Module
 	}
 };
 
-MODULE_INIT(ModuleLDAPAuth)
+MODULE_INIT(ModuleLDAPOper)

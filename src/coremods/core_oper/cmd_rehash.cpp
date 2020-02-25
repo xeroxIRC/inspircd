@@ -1,9 +1,15 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
+ *   Copyright (C) 2018-2019 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2013 Adam <Adam@anope.org>
+ *   Copyright (C) 2012-2015 Attila Molnar <attilamolnar@hush.com>
+ *   Copyright (C) 2012 Robby <robby@chatbelgie.be>
+ *   Copyright (C) 2009 Matt Smith <dz@inspircd.org>
  *   Copyright (C) 2009 Daniel De Graaf <danieldg@inspircd.org>
- *   Copyright (C) 2007-2008 Robin Burchell <robin+git@viroteck.net>
- *   Copyright (C) 2008 Craig Edwards <craigedwards@brainbox.cc>
+ *   Copyright (C) 2008 Robin Burchell <robin+git@viroteck.net>
+ *   Copyright (C) 2007-2008, 2010 Craig Edwards <brain@inspircd.org>
+ *   Copyright (C) 2007 Dennis Friis <peavey@inspircd.org>
  *
  * This file is part of InspIRCd.  InspIRCd is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -64,13 +70,10 @@ CmdResult CommandRehash::Handle(User* user, const Params& parameters)
 	// Rehash for me. Try to start the rehash thread
 	if (!ServerInstance->ConfigThread)
 	{
-		std::string m = user->nick + " is rehashing config file " + FileSystem::GetFileName(ServerInstance->ConfigFileName) + " on " + ServerInstance->Config->ServerName;
-		ServerInstance->SNO->WriteGlobalSno('a', m);
-
-		if (IS_LOCAL(user))
-			user->WriteNumeric(RPL_REHASHING, FileSystem::GetFileName(ServerInstance->ConfigFileName), "Rehashing");
-		else
-			ServerInstance->PI->SendUserNotice(user, "*** Rehashing server " + FileSystem::GetFileName(ServerInstance->ConfigFileName));
+		const std::string configfile = FileSystem::GetFileName(ServerInstance->ConfigFileName);
+		user->WriteRemoteNumeric(RPL_REHASHING, configfile, "Rehashing " + ServerInstance->Config->ServerName);
+		ServerInstance->SNO->WriteGlobalSno('a', "%s is rehashing %s on %s", user->nick.c_str(),
+			configfile.c_str(), ServerInstance->Config->ServerName.c_str());
 
 		/* Don't do anything with the logs here -- logs are restarted
 		 * after the config thread has completed.
@@ -83,10 +86,7 @@ CmdResult CommandRehash::Handle(User* user, const Params& parameters)
 		 * A rehash is already in progress! ahh shit.
 		 * XXX, todo: we should find some way to kill runaway rehashes that are blocking, this is a major problem for unrealircd users
 		 */
-		if (IS_LOCAL(user))
-			user->WriteNotice("*** Could not rehash: A rehash is already in progress.");
-		else
-			ServerInstance->PI->SendUserNotice(user, "*** Could not rehash: A rehash is already in progress.");
+		user->WriteRemoteNotice("*** Could not rehash: A rehash is already in progress.");
 	}
 
 	// Always return success so spanningtree forwards an incoming REHASH even if we failed

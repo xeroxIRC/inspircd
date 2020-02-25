@@ -1,6 +1,7 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
+ *   Copyright (C) 2018-2019 Sadie Powell <sadie@witchery.services>
  *   Copyright (C) 2015-2016 Attila Molnar <attilamolnar@hush.com>
  *
  * This file is part of InspIRCd.  InspIRCd is free software: you can
@@ -257,7 +258,7 @@ class Numerics::NoSuchChannel : public Numeric::Numeric
 	NoSuchChannel(const std::string& chan)
 		: Numeric(ERR_NOSUCHCHANNEL)
 	{
-		push(chan);
+		push(chan.empty() ? "*" : chan);
 		push("No such channel");
 	}
 };
@@ -269,7 +270,7 @@ class Numerics::NoSuchNick : public Numeric::Numeric
 	NoSuchNick(const std::string& nick)
 		: Numeric(ERR_NOSUCHNICK)
 	{
-		push(nick);
+		push(nick.empty() ? "*" : nick);
 		push("No such nick");
 	}
 };

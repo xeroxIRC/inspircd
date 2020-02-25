@@ -1,13 +1,19 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
- *   Copyright (C) 2009 Daniel De Graaf <danieldg@inspircd.org>
+ *   Copyright (C) 2019 Matt Schatz <genius3000@g3k.solutions>
+ *   Copyright (C) 2018 linuxdaemon <linuxdaemon.irc@gmail.com>
+ *   Copyright (C) 2013 Daniel Vassdal <shutter@canternet.org>
+ *   Copyright (C) 2012-2016, 2018 Attila Molnar <attilamolnar@hush.com>
+ *   Copyright (C) 2012-2014, 2017-2019 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2012, 2019 Robby <robby@chatbelgie.be>
+ *   Copyright (C) 2012 ChrisTX <xpipe@hotmail.de>
+ *   Copyright (C) 2009-2010 Daniel De Graaf <danieldg@inspircd.org>
+ *   Copyright (C) 2008 Thomas Stagner <aquanight@inspircd.org>
+ *   Copyright (C) 2007-2009 Dennis Friis <peavey@inspircd.org>
  *   Copyright (C) 2007-2008 Robin Burchell <robin+git@viroteck.net>
- *   Copyright (C) 2008 Pippijn van Steenhoven <pip88nl@gmail.com>
- *   Copyright (C) 2003-2008 Craig Edwards <craigedwards@brainbox.cc>
- *   Copyright (C) 2006-2007 Oliver Lupton <oliverlupton@gmail.com>
- *   Copyright (C) 2007 Dennis Friis <peavey@inspircd.org>
- *   Copyright (C) 2003 randomdan <???@???>
+ *   Copyright (C) 2007 Oliver Lupton <om@inspircd.org>
+ *   Copyright (C) 2006-2008, 2010 Craig Edwards <brain@inspircd.org>
  *
  * This file is part of InspIRCd.  InspIRCd is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -181,15 +187,6 @@ class serverstats
 class CoreExport InspIRCd
 {
  private:
-	/** Set up the signal handlers
-	 */
-	void SetSignals();
-
-	/** Daemonize the ircd and close standard input/output streams
-	 * @return True if the program daemonized succesfully
-	 */
-	bool DaemonSeed();
-
 	/** The current time, updated in the mainloop
 	 */
 	struct timespec TIME;
@@ -200,11 +197,6 @@ class CoreExport InspIRCd
 	char ReadBuffer[65535];
 
 	ClientProtocol::RFCEvents rfcevents;
-
-	/** Check we aren't running as root, and exit if we are
-	 * with exit code EXIT_STATUS_ROOT.
-	 */
-	void CheckRoot();
 
  public:
 
@@ -362,7 +354,7 @@ class CoreExport InspIRCd
 	/** Bind all ports specified in the configuration file.
 	 * @return The number of ports bound without error
 	 */
-	int BindPorts(FailedPortList &failed_ports);
+	size_t BindPorts(FailedPortList &failed_ports);
 
 	/** Find a user in the nick hash.
 	 * If the user cant be found in the nick hash check the uuid hash

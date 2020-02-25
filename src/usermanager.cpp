@@ -1,10 +1,17 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
+ *   Copyright (C) 2019 iwalkalone <iwalkalone69@gmail.com>
+ *   Copyright (C) 2019 Matt Schatz <genius3000@g3k.solutions>
+ *   Copyright (C) 2013-2016, 2018 Attila Molnar <attilamolnar@hush.com>
+ *   Copyright (C) 2013, 2018-2019 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2013, 2015 Adam <Adam@anope.org>
+ *   Copyright (C) 2013 Daniel Vassdal <shutter@canternet.org>
+ *   Copyright (C) 2012, 2019 Robby <robby@chatbelgie.be>
  *   Copyright (C) 2009-2010 Daniel De Graaf <danieldg@inspircd.org>
- *   Copyright (C) 2008 Dennis Friis <peavey@inspircd.org>
+ *   Copyright (C) 2009 Uli Schlachter <psychon@inspircd.org>
+ *   Copyright (C) 2008-2010 Craig Edwards <brain@inspircd.org>
  *   Copyright (C) 2008 Robin Burchell <robin+git@viroteck.net>
- *   Copyright (C) 2008 Craig Edwards <craigedwards@brainbox.cc>
  *
  * This file is part of InspIRCd.  InspIRCd is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -112,6 +119,7 @@ namespace
 UserManager::UserManager()
 	: already_sent_id(0)
 	, unregistered_count(0)
+	, uline_count(0)
 {
 }
 
@@ -149,10 +157,23 @@ void UserManager::AddUser(int socket, ListenSocket* via, irc::sockets::sockaddrs
 	{
 		ListenSocket::IOHookProvRef& iohookprovref = *i;
 		if (!iohookprovref)
+		{
+			if (!iohookprovref.GetProvider().empty())
+			{
+				ServerInstance->Logs->Log("USERS", LOG_DEBUG, "Non-existent I/O hook '%s' in <bind:%s> tag at %s",
+					iohookprovref.GetProvider().c_str(),
+					i == via->iohookprovs.begin() ? "hook" : "ssl",
+					via->bind_tag->getTagLocation().c_str());
+				this->QuitUser(New, "Internal error handling connection");
+				return;
+			}
 			continue;
+		}
 
 		iohookprovref->OnAccept(eh, client, server);
-		// IOHook could have encountered a fatal error, e.g. if the TLS ClientHello was already in the queue and there was no common TLS version
+
+		// IOHook could have encountered a fatal error, e.g. if the TLS ClientHello
+		// was already in the queue and there was no common TLS version.
 		if (!eh->getError().empty())
 		{
 			QuitUser(New, eh->getError());

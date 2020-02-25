@@ -1,10 +1,11 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
+ *   Copyright (C) 2013, 2019 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2012 Robby <robby@chatbelgie.be>
  *   Copyright (C) 2009 Daniel De Graaf <danieldg@inspircd.org>
  *   Copyright (C) 2007 Dennis Friis <peavey@inspircd.org>
- *   Copyright (C) 2007 Robin Burchell <robin+git@viroteck.net>
- *   Copyright (C) 2006 Craig Edwards <craigedwards@brainbox.cc>
+ *   Copyright (C) 2006, 2010 Craig Edwards <brain@inspircd.org>
  *
  * This file is part of InspIRCd.  InspIRCd is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -32,22 +33,18 @@ class ModuleModesOnConnect : public Module
 
 	void OnUserConnect(LocalUser* user) CXX11_OVERRIDE
 	{
-		ConfigTag* tag = user->MyClass->config;
-		std::string ThisModes = tag->getString("modes");
-		if (!ThisModes.empty())
-		{
-			std::string buf;
-			irc::spacesepstream ss(ThisModes);
+		const std::string modestr = user->MyClass->config->getString("modes");
+		if (modestr.empty())
+			return;
 
-			CommandBase::Params modes;
-			modes.push_back(user->nick);
+		CommandBase::Params params;
+		params.push_back(user->nick);
 
-			// split ThisUserModes into modes and mode params
-			while (ss.GetToken(buf))
-				modes.push_back(buf);
+		irc::spacesepstream modestream(modestr);
+		for (std::string modetoken; modestream.GetToken(modetoken); )
+			params.push_back(modetoken);
 
-			ServerInstance->Parser.CallHandler("MODE", modes, user);
-		}
+		ServerInstance->Parser.CallHandler("MODE", params, user);
 	}
 };
 

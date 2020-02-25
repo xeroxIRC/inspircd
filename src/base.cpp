@@ -1,10 +1,13 @@
 /*
  * InspIRCd -- Internet Relay Chat Daemon
  *
+ *   Copyright (C) 2013, 2018-2019 Sadie Powell <sadie@witchery.services>
+ *   Copyright (C) 2012, 2014-2015 Attila Molnar <attilamolnar@hush.com>
+ *   Copyright (C) 2012 Robby <robby@chatbelgie.be>
+ *   Copyright (C) 2010 Craig Edwards <brain@inspircd.org>
  *   Copyright (C) 2009 Daniel De Graaf <danieldg@inspircd.org>
  *   Copyright (C) 2007 Dennis Friis <peavey@inspircd.org>
- *   Copyright (C) 2004-2006 Craig Edwards <craigedwards@brainbox.cc>
- *   Copyright (C) 2006 Oliver Lupton <oliverlupton@gmail.com>
+ *   Copyright (C) 2006 Oliver Lupton <om@inspircd.org>
  *
  * This file is part of InspIRCd.  InspIRCd is free software: you can
  * redistribute it and/or modify it under the terms of the GNU General Public
@@ -29,26 +32,27 @@
 
 classbase::classbase()
 {
+#ifdef INSPIRCD_ENABLE_RTTI
 	if (ServerInstance)
-		ServerInstance->Logs->Log("CULLLIST", LOG_DEBUG, "classbase::+ @%p", (void*)this);
+		ServerInstance->Logs->Log("CULLLIST", LOG_DEBUG, "classbase::+%s @%p", typeid(*this).name(), (void*)this);
+#endif
 }
 
 CullResult classbase::cull()
 {
-	if (ServerInstance)
 #ifdef INSPIRCD_ENABLE_RTTI
-		ServerInstance->Logs->Log("CULLLIST", LOG_DEBUG, "classbase::-%s @%p",
-			typeid(*this).name(), (void*)this);
-#else
-		ServerInstance->Logs->Log("CULLLIST", LOG_DEBUG, "classbase::- @%p", (void*)this);
+	if (ServerInstance)
+		ServerInstance->Logs->Log("CULLLIST", LOG_DEBUG, "classbase::-%s @%p", typeid(*this).name(), (void*)this);
 #endif
 	return CullResult();
 }
 
 classbase::~classbase()
 {
+#ifdef INSPIRCD_ENABLE_RTTI
 	if (ServerInstance)
-		ServerInstance->Logs->Log("CULLLIST", LOG_DEBUG, "classbase::~ @%p", (void*)this);
+		ServerInstance->Logs->Log("CULLLIST", LOG_DEBUG, "classbase::~%s @%p", typeid(*this).name(), (void*)this);
+#endif
 }
 
 CullResult::CullResult()
